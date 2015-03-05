@@ -1,0 +1,141 @@
+# until doc p. 39
+
+
+TO INSTALL GIT IN A LINUX MACHINE
+package: git-core
+
+PREPARATION
+With the following commands some info will be added to your git
+configuration file, i.e. ~/.gitconfig
+
+git config --global user.name "Despo Panoglou"
+git config --global user.email "desprh@yahoo.gr"
+
+You can override this data for a specific project, running the same
+commands but without the "--global" option
+
+TO CREATE A NEW REPOSITORY IN BITBUCKET
+
+Log in in bitbucket.org
+At the top of the page: Create (new repository)
+<!--
+Then go to the directory you wish to add to the repository
+
+cd test
+git init
+git remote add origin https://desprh@bitbucket.org/desprh/test.git
+# . . . changes (e.g. add a file) . . .
+# the following two commands might run multiple times before pushing
+git add . ; git commit -m "first commit" .
+# At this point or when you have finished your changes, you normally have
+# to push it by the command "git push". But as it is the first time, you
+# have to set the defaults.
+git config --global push.default simple
+# After this command, you make changes, "add", "commit" as previously and
+# finally:
+git push
+-->
+
+TO CLONE AN EXISTING REPOSITORY
+
+git clone https://desprh@bitbucket.org/desprh/test.git
+# the name of the directory that will be created will be "test"
+cd test
+git add . ; git commit -m "first commit" .
+git push # by default to master branch
+You go home and want to update what is done. Provided that in the past you have cloned the repository, you receive the changes since last commit by:
+git pull
+Remember that pull=fetch+merge, i.e. go to the repository, fetch the changes, and merge them with your current version. "pull" always merges with our current branch.
+
+GENERAL COMMANDS
+
+git log          # shows the commiting history (meassges from each commit)
+git log --stat   # shows the commiting history (lines changed in each file)
+git log f        # shows the commiting history of file "f"
+git status       # shows whether there are changes to be commited
+git diff         # see what is there to be commited
+
+<!--
+We saw that before pushing, we have to "add" the modified files and
+"commit" the changes. Instead of those two commands, one can give the
+following single command:
+git commit -a -m "message"
+-->
+
+If you omit the "-m message" option, then by running the commit command,
+it will prompt you for a message. Instead of the short form allowed in the
+command line, now you will be allowed to give a short message of 50
+characters, then leave an empty line, and then write a more detailed
+description of the changes incorporated in this commit.
+
+TO WORK WITH BRANCHES
+
+Branches are some kind of different routes an initial version of a project
+might take.
+
+git branch threedim # create a new branch
+git branch          # get a list of existing branches (* shows current)
+git checkout twodim # switch to the branch "twodim"
+
+Your current branch is twodim. You can merge it to threedim by
+git merge threedim
+
+If there is any conflict in merging the two branches, you can see them by:
+git diff
+
+If you want to delete a branch:
+git branch -d twodim   # keeping it in the history tree
+git branch -D twodim   # removing it permanently from the history tree
+
+If you get stuck with the conflicts and want to start over:
+git reset --hard HEAD      # in case you have not yet commited the merge
+git reset --hard ORIG_HEAD # in case you have already commited the merge
+
+git diff master..test # differences between branches
+
+CLONING A PROJECT
+despodir=/home/despo
+karindir=/home/karin
+Provided that the directory "$despodir/hdust" includes a ".git" directory,
+Karin can clone this directory and work on her own version, in the same
+machine.
+karin:$ cd $karindir
+karin:$ git clone $despodir/hdust karinhdust
+Karin modifies the code (i.e. commits and adds), and I want to receive those changes. So I merge with her version:
+despo:$ cd $despodir
+despo:$ git pull $karindir/karinhdust
+This will fetch and merge my version with Karin's. But usually this is not what we want, especially when the speed of changes by more than one persons is large. Note that pull=fetch+merge, and we would rather fetch and keep the clone separately from our current version. So what we do is the following:
+despo:$ git remote add karin $karindir/karinhdust
+despo:$ git fetch karin
+In this way, karin's version is kept in a separate branch, karin/master.
+This command will show the changes made by Karin since she branched from Despo's master branch.
+despo:$ git log -p master..karin/master
+Remember that we are currently in Despo's master branch, so if logs look OK, we can merge:
+despo:$ git merge karin/master
+Despo has merged and then modified, added, commited, pushed to the main repository. After that Karin can update with all those changes.
+karin:$ git pull
+Note that Karin does not have to give the path to despo's repository, since when she first cloned it was exactly from it, therefore this is the default where git pulls from and pushes to. So by default this command has been given:
+karin:$ git config --get remote.origin.url $despodir
+If you want to chenge the default repository, you have to give that command with $despodir substituted by the new repository.
+The complete configuration created by clone is shown with 
+git config -l
+With
+man git config
+you access a manual with all the options.
+
+TO CREATE A NEW REPOSITORY IN YOUR OWN COMPUTER
+
+REPOS=/jungle/Backup/repos
+SRC=/home/despo/Documents/programs/tests
+SRCGIT=tests.git
+cd $REPOS
+git init --bare $SRCGIT
+cd $SRC
+git init
+git add .
+git commit -m "my first comment: commit" .
+git remote add origin $REPOS/$SRCGIT
+git push -u origin master
+
+VERSIONS
+
